@@ -28,7 +28,6 @@ form.onsubmit = (e) => {
 //PREVINE COMPORTAMENTO PADRÃO DE RECARREGAR A PÁGINA
     e.preventDefault()
 
-
 //New Object, content value new expense
     const newExpense = {
 
@@ -46,21 +45,50 @@ form.onsubmit = (e) => {
 
 function expenseAdd(newExpense){
     try{
-//CRIAR ELEMENTO li PARA SER ADICIONADO NA LISTA ul DE FORMA DINÂMICA
 
+//CRIAR ELEMENTO li PARA SER ADICIONADO NA LISTA ul DE FORMA DINÂMICA
         const expenseItem = document.createElement('li')
+//ADICIONAR O ITEM CRIADO A LISTA DE DESPESAS
         expenseItem.classList.add("expense")
 
 //CRIAR ICONE DA CATEGORIA
         const expenseIcon = document.createElement('img')
+
+//setAttribute(acessar atributo) - "src", depois `img- é a pasta onde está a imagem`
+//ENTÃO ACESSO O newExpense e dentro dele category_id que é um objeto que retorna o valor da categoria
         expenseIcon.setAttribute("src", `img/${newExpense.category_id}.svg`)
+
+//NESSE CASO EU PASSO "alt" COMO PARÂMETRO DA FUNÇÃO, E category_name, que está declarado
+//DENTRO DO newExpense também, acessando então a indexItem, ou seja, o item que estiver sendo
+//selecionado naquele momento        
         expenseIcon.setAttribute("alt", newExpense.category_name)
 
-//ADICIONA AS INFORMAÇÕES NO ITEM
-        expenseItem.append(expenseIcon)
         
-//ADICIONA O ITEM NA LISTA
-        expenseList.append(expenseItem)
+        //RESPOSTAS DO FORMULÁRIO PREENCHIDO
+        const expenseInf = document.createElement('div')
+        expenseInf.classList.add('expense-inf')
+        
+        //CRIAR NOME DA DESPESA
+        const expenseName = document.createElement('strong')
+        expenseName.textContent = newExpense.expense
+        
+        //CRIA A CATEGORIA DA DESPESA
+        const expenseCategory = document.createElement('span')
+        expenseCategory.textContent = newExpense.category_name
+        
+        //ADICIONA NAME E CATEGORY AS INFORMAÇÕES DA LISTA DE INFORMAÇÕES DAS DISPESAS
+        expenseInf.append(expenseName, expenseCategory)
+
+        //ADICIONA A LEGENDA DE VALOR A LISTA DE INFORMAÇÕES DAS DIVIDAS
+        const expenseAmount = document.createElement('span')
+        expenseAmount.classList.add('expense-amount')
+        expenseAmount.innerHTML = `<small>R$</small>${newExpense.amount.toUpperCase().replace("R$", "")}`
+
+        //ADICIONA AS INFORMAÇÕES NO ITEM
+        expenseItem.append(expenseIcon, expenseInf, expenseAmount)
+        
+        //ADICIONA O ITEM NA LISTA
+        expenseList.appendChild(expenseItem)
 
     } catch(error){
         alert('Não foi possível atualizar a lista de despesas!')
