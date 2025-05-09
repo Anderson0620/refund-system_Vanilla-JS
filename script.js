@@ -6,6 +6,7 @@ const expense = document.getElementById('expense')
 //ELEMENTOS DA LISTA
 
 const expenseList = document.querySelector('ul')
+const expenseQuantity = document.querySelector('aside header p span')
 
 //AMOUNT
 
@@ -84,14 +85,41 @@ function expenseAdd(newExpense){
         expenseAmount.classList.add('expense-amount')
         expenseAmount.innerHTML = `<small>R$</small>${newExpense.amount.toUpperCase().replace("R$", "")}`
 
+
+        //ICONE DE REMOVER DESPESA
+        const removeIcon = document.createElement('img')
+        removeIcon.classList.add('remove-icon')
+        removeIcon.setAttribute('src', 'img/remove.svg')
+        removeIcon.setAttribute('alt','remover')
+
         //ADICIONA AS INFORMAÇÕES NO ITEM
-        expenseItem.append(expenseIcon, expenseInf, expenseAmount)
-        
+        expenseItem.append(expenseIcon, expenseInf, expenseAmount, removeIcon)
+        //ATUALIZA OS TOTAIS
+        updateTotals()
+    
+
         //ADICIONA O ITEM NA LISTA
         expenseList.appendChild(expenseItem)
 
-    } catch(error){
+        
+    }
+    catch(error){
         alert('Não foi possível atualizar a lista de despesas!')
         console.log(error)
+    }
+
+}
+
+//ATUALIZAR OS TOTAIS, A SOMA DAS DESPESAS
+
+function updateTotals(){
+    try {
+//RECUPERA TODOS OS ITENS LI DA LISTA UL
+        const items = expenseList.children
+        expenseQuantity.textContent = `${items.length} ${items.length > 1 ? 'despesa' : 'despesa'}`
+        console.log(items)
+
+} catch (error) {
+        console.log('Erro na lista')
     }
 }
