@@ -1,125 +1,133 @@
-//HTML
+//CAPTURANDO ITENS DO FORMULÁRIO
 const form = document.querySelector('form')
-const amount = document.getElementById('amount')
 const expense = document.getElementById('expense')
+const category = document.getElementById('category')
+const amount = document.getElementById('amount')
 
-//ELEMENTOS DA LISTA
+//CAPTURANDO LISTA
+const list = document.querySelector('ul')
+const expenseTotal = document.querySelector('aside header h2')
+const expenseQuantity = document.querySelector('aside header span')
 
-const expenseList = document.querySelector('ul')
-const expenseQuantity = document.querySelector('aside header p span')
-
-//AMOUNT
-
-amount.oninput = () => {
-    let value = amount.value.replace(/\D/g, "")
-    value = Number(value) /100
-    amount.value = formatCurrencyBRL(value)
-}
-
-    function formatCurrencyBRL (value){
-        value = value.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        })
-        return value
-    }
-
-//CAPTURA EVENTO DE SUBMIT DE USUARIO PARA OBTER VALORES
-form.onsubmit = (e) => {
-//PREVINE COMPORTAMENTO PADRÃO DE RECARREGAR A PÁGINA
+form.addEventListener('submit', (e)=> {
     e.preventDefault()
 
-//New Object, content value new expense
     const newExpense = {
+        id: new Date().getTime(),
+        expense: expense.value,
+        category_id: category.value,
+        category_name: category.options[category.selectedIndex].text,
+        amount: amount.value,
+        created_at: new Date(),
+    }
 
-    id: new Date().getTime(),
-    expense: expense.value, //CAPTURANDO O VALOR INSERIDO COMO DESPESA
-    category_id:category.value, //CAPTURANDO O VALOR DA CATEGORIA SELECIONADA 
-    category_name: category.options[category.selectedIndex].text,//CAPTURANDO O TEXTO DA CATEGORIA QUE ESTA SELECIONADA(selectedIndes).
-    amount: amount.value, //CAPTURANDO O VALOR DA DESPESA
-    created_dt: new Date(),
-    }   
-
-//CHAMANDO A FUNÇÃO QUE VAI ADICIONAR UM NOVO ITEM
     expenseAdd(newExpense)
+})
+
+function formatCurrencyBRL(value){
+    value = value.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    })
+    return value
+}
+
+amount.oninput = () => {
+    let value = amount.value.replace(/\D/g,'')
+    value = Number(value) /100
+     amount.value = formatCurrencyBRL(value)
 }
 
 function expenseAdd(newExpense){
-    try{
-
-//CRIAR ELEMENTO li PARA SER ADICIONADO NA LISTA ul DE FORMA DINÂMICA
-        const expenseItem = document.createElement('li')
-//ADICIONAR O ITEM CRIADO A LISTA DE DESPESAS
-        expenseItem.classList.add("expense")
-
-//CRIAR ICONE DA CATEGORIA
-        const expenseIcon = document.createElement('img')
-
-//setAttribute(acessar atributo) - "src", depois `img- é a pasta onde está a imagem`
-//ENTÃO ACESSO O newExpense e dentro dele category_id que é um objeto que retorna o valor da categoria
-        expenseIcon.setAttribute("src", `img/${newExpense.category_id}.svg`)
-
-//NESSE CASO EU PASSO "alt" COMO PARÂMETRO DA FUNÇÃO, E category_name, que está declarado
-//DENTRO DO newExpense também, acessando então a indexItem, ou seja, o item que estiver sendo
-//selecionado naquele momento        
-        expenseIcon.setAttribute("alt", newExpense.category_name)
-
+    try {
         
-        //RESPOSTAS DO FORMULÁRIO PREENCHIDO
-        const expenseInf = document.createElement('div')
-        expenseInf.classList.add('expense-inf')
-        
-        //CRIAR NOME DA DESPESA
-        const expenseName = document.createElement('strong')
-        expenseName.textContent = newExpense.expense
-        
-        //CRIA A CATEGORIA DA DESPESA
-        const expenseCategory = document.createElement('span')
-        expenseCategory.textContent = newExpense.category_name
-        
-        //ADICIONA NAME E CATEGORY AS INFORMAÇÕES DA LISTA DE INFORMAÇÕES DAS DISPESAS
-        expenseInf.append(expenseName, expenseCategory)
+    //CRIANDO NOVO ELEMENTE LI PARA LISTA UL
+    const expenseItem = document.createElement('li')
+    expenseItem.classList.add('expense')
+    expenseItem.textContent = newExpense.expense
 
-        //ADICIONA A LEGENDA DE VALOR A LISTA DE INFORMAÇÕES DAS DIVIDAS
-        const expenseAmount = document.createElement('span')
-        expenseAmount.classList.add('expense-amount')
-        expenseAmount.innerHTML = `<small>R$</small>${newExpense.amount.toUpperCase().replace("R$", "")}`
-
-
-        //ICONE DE REMOVER DESPESA
-        const removeIcon = document.createElement('img')
-        removeIcon.classList.add('remove-icon')
-        removeIcon.setAttribute('src', 'img/remove.svg')
-        removeIcon.setAttribute('alt','remover')
-
-        //ADICIONA AS INFORMAÇÕES NO ITEM
-        expenseItem.append(expenseIcon, expenseInf, expenseAmount, removeIcon)
-        //ATUALIZA OS TOTAIS
-        updateTotals()
+    //ADICIONA ICONE SEGUNDO A CATEGORIA SELECIONADA
+    const expenseIcon = document.createElement('img')
+    expenseIcon.classList.add('expense-icon')
+    expenseIcon.setAttribute('src', `img/${newExpense.category_id}.svg`)
     
+    
+    //ADICIONA DETALHES DA LISTA
+    const expenseInfo = document.createElement('div')
+    expenseInfo.classList.add('expense-info')
+    
+    const expenseName = document.createElement('strong')
+    expenseName.textContent = newExpense.expense
 
-        //ADICIONA O ITEM NA LISTA
-        expenseList.appendChild(expenseItem)
+    const expenseCategory = document.createElement('span')
+    expenseCategory.textContent = newExpense.category_name
+
+    const expenseAmount = document.createElement('span')
+    expenseAmount.textContent = newExpense.amount
+    expenseAmount.classList.add('expense-amount')
+
+    expenseInfo.append(expenseName, expenseCategory, expenseAmount)
+    
+    //ADICIONA ICONE DE REMOVER
+    const expenseRemove = document.createElement('img')
+    expenseRemove.classList.add('remove-icon')
+    expenseRemove.setAttribute('src', `img/remove.svg`)
+    expenseRemove.setAttribute('alt', 'Remover')
+
+    expenseRemove.addEventListener('click', ()=> {
+        expenseItem.remove()
+        updateTotals()
+    })
 
         
-    }
-    catch(error){
-        alert('Não foi possível atualizar a lista de despesas!')
-        console.log(error)
-    }
+    //ADICIONA NOVOS ITENS
+    expenseItem.append(expenseIcon, expenseInfo, expenseRemove)
 
+    list.append(expenseItem)
+    
+    //ATUALIZAR OS TOTAIS
+        updateTotals()
+
+    } catch (error) {
+        alert('ERRO')
+    }
 }
-
-//ATUALIZAR OS TOTAIS, A SOMA DAS DESPESAS
 
 function updateTotals(){
     try {
-//RECUPERA TODOS OS ITENS LI DA LISTA UL
-        const items = expenseList.children
-        expenseQuantity.textContent = `${items.length} ${items.length > 1 ? 'despesa' : 'despesa'}`
-        console.log(items)
+        const items = list.children
+        expenseQuantity.textContent = 
+        `${items.length}
+         ${items.length > 1 ? 
+        'despesas' : 'dispesa'} `
 
-} catch (error) {
-        console.log('Erro na lista')
+        //CALCULAR OS TOTAIS
+        let total = 0
+
+        for (let item = 0; item < items.length; item++) {
+            const expenseAmount = items[item].querySelector('.expense-amount')
+
+            if (expenseAmount) {
+                let value = expenseAmount.textContent
+                    .replace(/[^\d,]/g, '') // remove tudo que não for número ou vírgula
+                    .replace(',', '.')      // troca vírgula por ponto
+
+                value = parseFloat(value)
+
+                if (!isNaN(value)) {
+                    total += value
+                }
+            }
+        }
+
+        // Atualiza o total no HTML, formatado
+        expenseTotal.textContent = formatCurrencyBRL(total)
+
+    } 
+    
+    catch (error) {
+        alert('Não foi possivel calcular os totais')
     }
 }
+
+
